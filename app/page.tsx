@@ -42,9 +42,10 @@ export default function Home() {
         <p className="mx-auto mt-2 max-w-md text-orange-50">A full Tamil breakfast, lunch thali and dinner, picked for you.</p>
         <button
           onClick={spin}
-          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-xl font-semibold text-terracotta shadow-xl ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-2xl active:translate-y-0"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 shadow-xl ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-2xl active:translate-y-0"
         >
-          <span className="text-2xl">🎲</span> {plan ? "Spin again" : "Spin my menu"}
+          <span className="text-2xl" aria-hidden>🎲</span>
+          <span className="text-xl font-semibold text-orange-700">{plan ? "Spin again" : "Spin my menu"}</span>
         </button>
       </section>
 

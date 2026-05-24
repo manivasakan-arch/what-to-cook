@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
-import { Dish, Meal, MEALS } from "@/lib/types";
+import { Dish, Meal, MEALS, Category } from "@/lib/types";
 import { youtubeSearch } from "@/lib/seed";
 
 const LABELS: Record<Meal, string> = { breakfast: "Breakfast", lunch: "Lunch", dinner: "Dinner" };
+const CATEGORIES: Category[] = ["tiffin", "chutney", "sambar", "rice", "kuzhambu", "poriyal", "rasam", "curd", "onepot"];
 
 function slugify(s: string): string {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || `dish-${Date.now()}`;
@@ -13,6 +14,7 @@ export function DishForm({ initial, onSave, onCancel }: { initial?: Dish; onSave
   const [name, setName] = useState(initial?.name ?? "");
   const [nameTamil, setNameTamil] = useState(initial?.nameTamil ?? "");
   const [meals, setMeals] = useState<Meal[]>(initial?.meals ?? []);
+  const [category, setCategory] = useState<Category>(initial?.category ?? "tiffin");
   const [ingredients, setIngredients] = useState((initial?.ingredients ?? []).join("\n"));
   const [steps, setSteps] = useState((initial?.steps ?? []).join("\n"));
   const [protein, setProtein] = useState(String(initial?.proteinGrams ?? 0));
@@ -30,6 +32,7 @@ export function DishForm({ initial, onSave, onCancel }: { initial?: Dish; onSave
       name: name.trim(),
       nameTamil: nameTamil.trim() || undefined,
       meals,
+      category,
       ingredients: ingredients.split("\n").map((s) => s.trim()).filter(Boolean),
       steps: steps.split("\n").map((s) => s.trim()).filter(Boolean),
       proteinGrams: Number(protein) || 0,
@@ -52,6 +55,12 @@ export function DishForm({ initial, onSave, onCancel }: { initial?: Dish; onSave
           </label>
         ))}
       </div>
+      <label className="block text-sm">
+        <span className="mb-1 block font-medium text-stone-600">Role on the plate</span>
+        <select className={field} value={category} onChange={(e) => setCategory(e.target.value as Category)}>
+          {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </label>
       <textarea className={field} rows={4} placeholder="Ingredients, one per line" value={ingredients} onChange={(e) => setIngredients(e.target.value)} />
       <textarea className={field} rows={5} placeholder="Steps, one per line" value={steps} onChange={(e) => setSteps(e.target.value)} />
       <input className={field} type="number" placeholder="Protein grams (estimate)" value={protein} onChange={(e) => setProtein(e.target.value)} />

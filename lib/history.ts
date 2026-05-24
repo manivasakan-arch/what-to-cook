@@ -15,9 +15,7 @@ export function usedInLast7Days(history: HistoryEntry[], today: Date = new Date(
   for (const entry of history) {
     const entryDate = new Date(entry.date + "T00:00:00");
     if (entryDate > cutoff && entryDate <= today) {
-      for (const id of Object.values(entry.picks)) {
-        if (id) ids.add(id);
-      }
+      for (const id of entry.ids ?? []) ids.add(id);
     }
   }
   return ids;

@@ -2,14 +2,25 @@ export type Meal = "breakfast" | "lunch" | "dinner";
 
 export const MEALS: Meal[] = ["breakfast", "lunch", "dinner"];
 
-export type DishKind = "main" | "side";
+// What role a dish plays in a composed plate.
+export type Category =
+  | "tiffin"   // breakfast / dinner light main (idli, dosa, pongal, parotta...)
+  | "chutney"  // accompaniment for tiffin
+  | "sambar"   // accompaniment for tiffin
+  | "rice"     // plain rice, the thali base
+  | "kuzhambu" // lunch gravy hero (vatha kuzhambu, mor kuzhambu...)
+  | "poriyal"  // dry vegetable side
+  | "rasam"    // thali rasam
+  | "curd"     // curd / raita
+  | "onepot";  // self-contained main (biryani, variety rice, fried rice, kothu...)
 
 export interface Dish {
   id: string;
   name: string;
   nameTamil?: string;
   meals: Meal[];
-  kind?: DishKind; // undefined treated as "main"
+  category: Category;
+  pairs?: string[]; // signature accompaniment ids, tried before a random one
   ingredients: string[];
   steps: string[];
   proteinGrams: number;
@@ -23,12 +34,17 @@ export interface AppSettings {
 }
 
 export interface HistoryEntry {
-  date: string; // ISO date "YYYY-MM-DD"
-  picks: { breakfast?: string; lunch?: string; lunchSide?: string; dinner?: string };
+  date: string;   // ISO date "YYYY-MM-DD"
+  ids: string[];  // every dish id used that day
 }
 
-// A full day: breakfast, lunch main + lunch poriyal side, dinner.
-export type SlotKey = "breakfast" | "lunch" | "lunchSide" | "dinner";
-export const SLOTS: SlotKey[] = ["breakfast", "lunch", "lunchSide", "dinner"];
-
-export type DayPicks = Record<SlotKey, Dish | null>;
+// A composed plate for one meal.
+export interface ComboItem {
+  role: string; // "Main", "Chutney", "Rice", "Kuzhambu", "Poriyal", "Rasam", "Curd"
+  dish: Dish;
+}
+export interface MealCombo {
+  meal: Meal;
+  items: ComboItem[];
+}
+export type DayPlan = Record<Meal, MealCombo | null>;

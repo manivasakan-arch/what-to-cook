@@ -14,7 +14,7 @@ class MemoryStorage implements Storage {
 }
 
 function seedDish(id: string): Dish {
-  return { id, name: id, meals: ["lunch"], ingredients: [], steps: [], proteinGrams: 10, youtubeUrl: "", isCustom: false };
+  return { id, name: id, meals: ["lunch"], category: "onepot", ingredients: [], steps: [], proteinGrams: 10, youtubeUrl: "", isCustom: false };
 }
 
 let storage: MemoryStorage;
@@ -74,13 +74,13 @@ describe("LocalStorageStore settings", () => {
 describe("LocalStorageStore history", () => {
   it("starts empty and appends locked menus", () => {
     expect(store.getHistory()).toEqual([]);
-    store.lockMenu({ date: "2026-05-24", picks: { breakfast: "a" } });
+    store.lockMenu({ date: "2026-05-24", ids: ["a"] });
     expect(store.getHistory()).toHaveLength(1);
   });
   it("overwrites an entry for the same date", () => {
-    store.lockMenu({ date: "2026-05-24", picks: { breakfast: "a" } });
-    store.lockMenu({ date: "2026-05-24", picks: { breakfast: "b" } });
+    store.lockMenu({ date: "2026-05-24", ids: ["a"] });
+    store.lockMenu({ date: "2026-05-24", ids: ["b", "c"] });
     expect(store.getHistory()).toHaveLength(1);
-    expect(store.getHistory()[0].picks.breakfast).toBe("b");
+    expect(store.getHistory()[0].ids).toEqual(["b", "c"]);
   });
 });

@@ -61,6 +61,24 @@ describe("LocalStorageStore dishes", () => {
   });
 });
 
+describe("LocalStorageStore migrate", () => {
+  it("replaces stale pre-version data and clears old history", () => {
+    storage.setItem("wtc.dishes", JSON.stringify([{ id: "old", name: "old" }]));
+    storage.setItem("wtc.history", JSON.stringify([{ date: "2026-05-01", picks: {} }]));
+    store.migrate();
+    expect(store.getDishes().map((d) => d.id)).toEqual(["a", "b"]);
+    expect(store.getHistory()).toEqual([]);
+  });
+
+  it("leaves current-version data untouched on reload", () => {
+    store.migrate();
+    store.saveDish(seedDish("c"));
+    const reopened = new LocalStorageStore(storage, seed);
+    reopened.migrate();
+    expect(reopened.getDishes().map((d) => d.id)).toContain("c");
+  });
+});
+
 describe("LocalStorageStore settings", () => {
   it("returns defaults when unset", () => {
     expect(store.getSettings()).toEqual(DEFAULT_SETTINGS);

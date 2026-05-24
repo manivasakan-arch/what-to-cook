@@ -28,6 +28,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const s = new LocalStorageStore(window.localStorage, SEED_DISHES);
+    s.migrate();
     setStore(s);
     setDishes(s.getDishes());
     setSettings(s.getSettings());

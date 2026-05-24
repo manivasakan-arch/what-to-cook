@@ -4,7 +4,12 @@ export const KEYS = {
   dishes: "wtc.dishes",
   settings: "wtc.settings",
   history: "wtc.history",
+  seedVersion: "wtc.seedVersion",
 } as const;
+
+// Bump whenever the Dish/HistoryEntry shape changes so existing browsers
+// auto-replace stale data instead of rendering empty plates.
+export const SEED_VERSION = 3;
 
 export const DEFAULT_SETTINGS: AppSettings = { proteinGoalGrams: 60 };
 
@@ -73,5 +78,19 @@ export class LocalStorageStore implements Store {
   reseed(): Dish[] {
     this.storage.setItem(KEYS.dishes, JSON.stringify(this.seed));
     return this.seed;
+  }
+
+  /**
+   * Run once on load. If stored data predates the current SEED_VERSION
+   * (or is absent), replace dishes with the fresh seed and clear the old
+   * history, then stamp the version. Keeps existing browsers from showing
+   * empty plates after a schema change.
+   */
+  migrate(): void {
+    if (this.storage.getItem(KEYS.seedVersion) !== String(SEED_VERSION)) {
+      this.reseed();
+      this.resetHistory();
+      this.storage.setItem(KEYS.seedVersion, String(SEED_VERSION));
+    }
   }
 }

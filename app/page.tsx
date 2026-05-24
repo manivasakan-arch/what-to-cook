@@ -7,6 +7,10 @@ import { DayPlan, Meal, MEALS } from "@/lib/types";
 import { ProteinRing } from "@/components/ProteinRing";
 import { MealComboCard } from "@/components/MealComboCard";
 
+function prettyDate(): string {
+  return new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+}
+
 export default function Home() {
   const { ready, dishes, settings, history, lockMenu } = useStore();
   const [plan, setPlan] = useState<DayPlan | null>(null);
@@ -20,12 +24,10 @@ export default function Home() {
     setPlan(generateMenu(dishes, used, settings.proteinGoalGrams).plan);
     setLocked(false);
   }
-
   function respin(meal: Meal) {
     setPlan((prev) => (prev ? { ...prev, [meal]: respinCombo(dishes, meal, used, prev) } : prev));
     setLocked(false);
   }
-
   function lock() {
     if (!plan) return;
     lockMenu({ date: todayIso(new Date()), ids: planIds(plan) });
@@ -33,33 +35,40 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-3xl bg-gradient-to-br from-orange-500 to-amber-500 p-8 text-center text-white shadow">
-        <h1 className="text-3xl font-extrabold tracking-tight">What to Cook today?</h1>
-        <p className="mt-1 text-orange-50">Spin for a full Tamil breakfast, lunch thali and dinner.</p>
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-[2rem] border border-orange-200/60 bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 px-6 py-12 text-center text-white shadow-lg">
+        <p className="text-sm font-medium uppercase tracking-widest text-orange-50/90">{prettyDate()}</p>
+        <h1 className="mt-2 font-display text-4xl font-semibold leading-tight">What shall we cook today?</h1>
+        <p className="mx-auto mt-2 max-w-md text-orange-50">A full Tamil breakfast, lunch thali and dinner, picked for you.</p>
         <button
           onClick={spin}
-          className="mt-5 rounded-full bg-white px-10 py-5 text-2xl font-extrabold text-orange-600 shadow-lg transition hover:scale-105 active:scale-95"
+          className="mt-6 inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-xl font-semibold text-terracotta shadow-xl ring-1 ring-black/5 transition hover:-translate-y-0.5 hover:shadow-2xl active:translate-y-0"
         >
-          🎲 {plan ? "Spin again" : "Spin the menu"}
+          <span className="text-2xl">🎲</span> {plan ? "Spin again" : "Spin my menu"}
         </button>
       </section>
 
       {plan && <ProteinRing total={planProtein(plan)} goal={settings.proteinGoalGrams} />}
 
       {plan && (
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-3">
           {MEALS.map((m) => plan[m] && <MealComboCard key={m} combo={plan[m]!} onRespin={() => respin(m)} />)}
         </div>
       )}
 
       {plan && (
-        <button onClick={lock} disabled={locked} className="w-full rounded-2xl border bg-white py-4 text-lg font-semibold hover:bg-stone-100 disabled:opacity-50">
-          {locked ? "✓ Menu locked for today" : "Lock today's menu"}
+        <button
+          onClick={lock}
+          disabled={locked}
+          className="w-full rounded-2xl border border-stone-200 bg-white py-4 text-lg font-semibold text-ink shadow-sm transition hover:bg-stone-50 disabled:opacity-60"
+        >
+          {locked ? "✓ Today's menu is locked" : "Lock today's menu"}
         </button>
       )}
 
-      {!plan && <p className="text-center text-stone-500">Tap the button to plan today&apos;s meals.</p>}
+      {!plan && (
+        <p className="text-center font-display text-lg text-stone-500">Tap the dice to plan your day.</p>
+      )}
     </div>
   );
 }

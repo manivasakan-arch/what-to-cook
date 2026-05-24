@@ -17,7 +17,7 @@ export default function DishDetail({ params }: { params: Promise<{ id: string }>
     return (
       <div className="space-y-2">
         <p className="text-stone-600">This dish was removed.</p>
-        <Link href="/library" className="text-orange-600">Back to Library</Link>
+        <Link href="/library" className="text-terracotta">Back to Library</Link>
       </div>
     );
   }
@@ -27,39 +27,58 @@ export default function DishDetail({ params }: { params: Promise<{ id: string }>
   }
 
   return (
-    <article className="space-y-5">
-      <DishImage name={dish.name} url={dish.imageUrl} className="h-56 w-full rounded-2xl" />
-      <div className="flex items-start justify-between">
+    <article className="space-y-6">
+      <DishImage name={dish.name} url={dish.imageUrl} className="h-64 w-full rounded-3xl border border-stone-200" />
+
+      <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold">{dish.name}</h1>
-          {dish.nameTamil && <p className="text-stone-500">{dish.nameTamil}</p>}
-          <div className="mt-2 flex flex-wrap gap-2 text-xs">
-            {dish.meals.map((m) => <span key={m} className="rounded-full bg-stone-200 px-2 py-1 capitalize">{m}</span>)}
-            <span className="rounded-full bg-orange-100 px-2 py-1 text-orange-700">~{dish.proteinGrams}g protein</span>
+          <h1 className="font-display text-3xl font-semibold leading-tight">{dish.name}</h1>
+          {dish.nameTamil && <p className="mt-1 text-stone-500">{dish.nameTamil}</p>}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-stone-100 px-3 py-1 capitalize text-stone-600">{dish.category}</span>
+            {dish.meals.map((m) => (
+              <span key={m} className="rounded-full bg-stone-100 px-3 py-1 capitalize text-stone-600">{m}</span>
+            ))}
+            <span className="rounded-full bg-orange-100 px-3 py-1 font-medium text-terracotta">~{dish.proteinGrams}g protein</span>
           </div>
         </div>
-        <button onClick={() => setEditing(true)} className="rounded-lg border px-3 py-1 text-sm hover:bg-stone-100">Edit</button>
+        <button onClick={() => setEditing(true)} className="shrink-0 rounded-full border border-stone-200 px-4 py-1.5 text-sm font-medium hover:bg-stone-50">
+          Edit
+        </button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <section>
-          <h2 className="mb-2 font-semibold">Ingredients</h2>
-          <ul className="list-disc space-y-1 pl-5 text-sm">
-            {dish.ingredients.map((ing, i) => <li key={i}>{ing}</li>)}
+      <div className="grid gap-6 md:grid-cols-5">
+        <section className="md:col-span-2 rounded-3xl border border-stone-200 bg-white p-5">
+          <h2 className="mb-3 font-display text-xl font-semibold">Ingredients</h2>
+          <ul className="space-y-2 text-sm">
+            {dish.ingredients.map((ing, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-terracotta" />
+                <span>{ing}</span>
+              </li>
+            ))}
           </ul>
         </section>
-        <section>
-          <h2 className="mb-2 font-semibold">Method</h2>
-          <ol className="list-decimal space-y-2 pl-5 text-sm">
-            {dish.steps.map((s, i) => <li key={i}>{s}</li>)}
+
+        <section className="md:col-span-3 rounded-3xl border border-stone-200 bg-white p-5">
+          <h2 className="mb-3 font-display text-xl font-semibold">Method</h2>
+          <ol className="space-y-4">
+            {dish.steps.map((s, i) => (
+              <li key={i} className="flex gap-3">
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-orange-100 font-display text-sm font-semibold text-terracotta">{i + 1}</span>
+                <span className="text-sm leading-relaxed">{s}</span>
+              </li>
+            ))}
           </ol>
         </section>
       </div>
 
-      <a href={dish.youtubeUrl} target="_blank" rel="noopener noreferrer" className="inline-block rounded-lg bg-red-600 px-4 py-2 font-semibold text-white hover:bg-red-700">
-        Watch on YouTube
-      </a>
-      <p className="text-xs text-stone-400">Protein value is an estimate.</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <a href={dish.youtubeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-2.5 font-semibold text-white shadow-sm transition hover:bg-red-700">
+          ▶ Watch on YouTube
+        </a>
+        <span className="text-xs text-stone-400">Protein value is an estimate.</span>
+      </div>
     </article>
   );
 }

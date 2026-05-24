@@ -4,20 +4,25 @@ export function ProteinRing({ total, goal }: { total: number; goal: number }) {
   const met = total >= goal;
   const pct = goal > 0 ? Math.min(100, Math.round((total / goal) * 100)) : 100;
   const short = Math.max(0, goal - total);
+  const accent = met ? "#16a34a" : "#c2480f";
   return (
-    <div className="flex items-center gap-4 rounded-xl border bg-white p-4">
+    <div className="flex items-center gap-5 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm">
       <div
-        className="flex h-20 w-20 items-center justify-center rounded-full"
-        style={{ background: `conic-gradient(${met ? "#16a34a" : "#ea580c"} ${pct * 3.6}deg, #e7e5e4 0deg)` }}
+        className="grid h-24 w-24 shrink-0 place-items-center rounded-full"
+        style={{ background: `conic-gradient(${accent} ${pct * 3.6}deg, #ece7df 0deg)` }}
       >
-        <div className="flex h-16 w-16 flex-col items-center justify-center rounded-full bg-white">
-          <span className="text-lg font-bold">{total}g</span>
-          <span className="text-[10px] text-stone-500">of {goal}g</span>
+        <div className="grid h-[4.5rem] w-[4.5rem] place-items-center rounded-full bg-white text-center">
+          <div>
+            <div className="font-display text-xl font-semibold leading-none">{total}g</div>
+            <div className="text-[10px] uppercase tracking-wide text-stone-400">of {goal}g</div>
+          </div>
         </div>
       </div>
       <div>
-        <p className="font-semibold">{met ? "Protein goal met" : "Below protein goal"}</p>
-        {!met && <p className="text-sm text-orange-600">{short}g short. Re-spin or add a protein side.</p>}
+        <p className="font-display text-lg font-semibold">{met ? "Protein goal met" : "Below protein goal"}</p>
+        <p className="mt-0.5 text-sm text-stone-500">
+          {met ? "Today's plates cover your daily protein." : `${short}g short. Re-spin a meal or add a protein side.`}
+        </p>
       </div>
     </div>
   );

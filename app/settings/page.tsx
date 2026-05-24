@@ -10,31 +10,38 @@ export default function Settings() {
 
   if (!ready) return <p className="text-stone-500">Loading...</p>;
 
+  const card = "space-y-2 rounded-3xl border border-stone-200 bg-white p-5 shadow-sm";
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="font-display text-3xl font-semibold">Settings</h1>
 
-      <div className="space-y-2 rounded-xl border bg-white p-4">
-        <label className="block font-semibold">Daily protein goal (grams)</label>
-        <div className="flex items-center gap-2">
-          <input className="w-32 rounded-lg border px-3 py-2" type="number" min={0} value={goal} onChange={(e) => setGoal(e.target.value)} />
-          <button onClick={() => saveSettings({ proteinGoalGrams: Number(goal) || 0 })} className="rounded-lg bg-orange-600 px-4 py-2 font-semibold text-white hover:bg-orange-700">Save</button>
+      <div className={card}>
+        <label className="block font-display text-lg font-semibold">Daily protein goal</label>
+        <p className="text-sm text-stone-500">Spin auto re-rolls to try to meet this total across the day.</p>
+        <div className="flex items-center gap-2 pt-1">
+          <input
+            className="w-28 rounded-full border border-stone-200 px-4 py-2 outline-none focus:border-terracotta"
+            type="number" min={0} value={goal} onChange={(e) => setGoal(e.target.value)}
+          />
+          <span className="text-sm text-stone-500">grams</span>
+          <button onClick={() => saveSettings({ proteinGoalGrams: Number(goal) || 0 })} className="ml-2 rounded-full bg-terracotta px-5 py-2 font-semibold text-white transition hover:opacity-90">Save</button>
         </div>
         <p className="text-xs text-stone-400">Protein values across the app are estimates.</p>
       </div>
 
-      <div className="space-y-2 rounded-xl border bg-white p-4">
-        <label className="block font-semibold">No-repeat history</label>
-        <p className="text-sm text-stone-600">Clears the 7-day window so all dishes become eligible again.</p>
-        <button onClick={resetHistory} className="rounded-lg border px-4 py-2 text-red-600 hover:bg-red-50">Reset history</button>
+      <div className={card}>
+        <label className="block font-display text-lg font-semibold">No-repeat history</label>
+        <p className="text-sm text-stone-500">Clears the 7-day window so all dishes become eligible again.</p>
+        <button onClick={resetHistory} className="rounded-full border border-stone-200 px-5 py-2 font-medium text-red-600 transition hover:bg-red-50">Reset history</button>
       </div>
 
-      <div className="space-y-2 rounded-xl border bg-white p-4">
-        <label className="block font-semibold">Starter dishes</label>
-        <p className="text-sm text-stone-600">You currently have {dishes.length} dishes. Reload the 102 built-in Tamil dishes. This replaces the current list, including any edits or additions.</p>
+      <div className={card}>
+        <label className="block font-display text-lg font-semibold">Starter dishes</label>
+        <p className="text-sm text-stone-500">You have {dishes.length} dishes. Reload the built-in set. This replaces the current list, including edits and additions.</p>
         <button
-          onClick={() => { if (window.confirm("Replace the dish list with the 102 built-in dishes? Your edits and added dishes will be lost.")) reseed(); }}
-          className="rounded-lg border px-4 py-2 hover:bg-stone-100"
+          onClick={() => { if (window.confirm("Replace the dish list with the built-in dishes? Your edits and added dishes will be lost.")) reseed(); }}
+          className="rounded-full border border-stone-200 px-5 py-2 font-medium transition hover:bg-stone-50"
         >
           Reload starter dishes
         </button>

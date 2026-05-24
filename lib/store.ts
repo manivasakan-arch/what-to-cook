@@ -17,6 +17,7 @@ export interface Store {
   getHistory(): HistoryEntry[];
   lockMenu(entry: HistoryEntry): void;
   resetHistory(): void;
+  reseed(): Dish[];
 }
 
 export class LocalStorageStore implements Store {
@@ -66,5 +67,11 @@ export class LocalStorageStore implements Store {
 
   resetHistory(): void {
     this.storage.setItem(KEYS.history, JSON.stringify([]));
+  }
+
+  /** Overwrite the dish list with the built-in seed. Replaces any edits. */
+  reseed(): Dish[] {
+    this.storage.setItem(KEYS.dishes, JSON.stringify(this.seed));
+    return this.seed;
   }
 }

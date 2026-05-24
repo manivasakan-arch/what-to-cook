@@ -14,6 +14,7 @@ interface StoreContextValue {
   saveSettings: (settings: AppSettings) => void;
   lockMenu: (entry: HistoryEntry) => void;
   resetHistory: () => void;
+  reseed: () => void;
 }
 
 const StoreContext = createContext<StoreContextValue | null>(null);
@@ -39,9 +40,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const saveSettings = useCallback((s: AppSettings) => { store!.saveSettings(s); setSettings(store!.getSettings()); }, [store]);
   const lockMenu = useCallback((e: HistoryEntry) => { store!.lockMenu(e); setHistory(store!.getHistory()); }, [store]);
   const resetHistory = useCallback(() => { store!.resetHistory(); setHistory(store!.getHistory()); }, [store]);
+  const reseed = useCallback(() => { setDishes(store!.reseed()); }, [store]);
 
   return (
-    <StoreContext.Provider value={{ ready, dishes, settings, history, saveDish, deleteDish, saveSettings, lockMenu, resetHistory }}>
+    <StoreContext.Provider value={{ ready, dishes, settings, history, saveDish, deleteDish, saveSettings, lockMenu, resetHistory, reseed }}>
       {children}
     </StoreContext.Provider>
   );

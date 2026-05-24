@@ -1,4 +1,4 @@
-import { HistoryEntry, MEALS } from "./types";
+import { HistoryEntry } from "./types";
 
 export function todayIso(d: Date = new Date()): string {
   const y = d.getFullYear();
@@ -15,8 +15,7 @@ export function usedInLast7Days(history: HistoryEntry[], today: Date = new Date(
   for (const entry of history) {
     const entryDate = new Date(entry.date + "T00:00:00");
     if (entryDate > cutoff && entryDate <= today) {
-      for (const meal of MEALS) {
-        const id = entry.picks[meal];
+      for (const id of Object.values(entry.picks)) {
         if (id) ids.add(id);
       }
     }

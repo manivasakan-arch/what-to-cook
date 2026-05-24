@@ -51,6 +51,14 @@ describe("LocalStorageStore dishes", () => {
     store.saveDish(seedDish("c"));
     expect(store.getDishes().map((d) => d.id)).toEqual(["a", "b", "c"]);
   });
+
+  it("reseed restores the built-in seed, dropping edits", () => {
+    store.getDishes();
+    store.deleteDish("a");
+    store.saveDish(seedDish("custom"));
+    expect(store.reseed().map((d) => d.id)).toEqual(["a", "b"]);
+    expect(store.getDishes().map((d) => d.id)).toEqual(["a", "b"]);
+  });
 });
 
 describe("LocalStorageStore settings", () => {

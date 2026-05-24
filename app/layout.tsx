@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <header className="border-b bg-white">
             <nav className="mx-auto flex max-w-3xl items-center gap-6 px-4 py-3 text-sm font-medium">
               <Link href="/" className="text-lg font-bold text-orange-600">What to Cook?</Link>
+              <Link href="/" className="hover:text-orange-600">Home</Link>
               <Link href="/library" className="hover:text-orange-600">Library</Link>
               <Link href="/settings" className="hover:text-orange-600">Settings</Link>
             </nav>

@@ -1,16 +1,17 @@
 import { describe, it, expect } from "vitest";
-import { Dish, MealPicks } from "../types";
+import { Dish, DayPicks, DishKind, Meal } from "../types";
 import {
-  dishesForMeal,
-  pickForMeal,
+  mainsForMeal,
+  sidesForMeal,
+  pickFrom,
   proteinTotal,
   generateMenu,
-  respinMeal,
+  respinSlot,
 } from "../selection";
 
-function dish(id: string, meals: Dish["meals"], protein: number): Dish {
+function dish(id: string, meals: Meal[], kind: DishKind, protein: number): Dish {
   return {
-    id, name: id, meals, ingredients: [], steps: [],
+    id, name: id, meals, kind, ingredients: [], steps: [],
     proteinGrams: protein, youtubeUrl: "", isCustom: false,
   };
 }
@@ -19,64 +20,57 @@ function dish(id: string, meals: Dish["meals"], protein: number): Dish {
 const first = () => 0;
 
 const data: Dish[] = [
-  dish("idli", ["breakfast", "dinner"], 6),
-  dish("pongal", ["breakfast"], 8),
-  dish("sambar-rice", ["lunch"], 12),
-  dish("curd-rice", ["lunch", "dinner"], 9),
-  dish("dosa", ["breakfast", "dinner"], 7),
+  dish("idli", ["breakfast", "dinner"], "main", 6),
+  dish("pongal", ["breakfast"], "main", 8),
+  dish("sambar-rice", ["lunch"], "main", 12),
+  dish("curd-rice", ["lunch", "dinner"], "main", 9),
+  dish("dosa", ["breakfast", "dinner"], "main", 7),
+  dish("beans-poriyal", ["lunch"], "side", 5),
+  dish("carrot-poriyal", ["lunch"], "side", 4),
 ];
 
-describe("dishesForMeal", () => {
-  it("returns only dishes tagged for the meal", () => {
-    expect(dishesForMeal(data, "lunch").map((d) => d.id)).toEqual([
-      "sambar-rice", "curd-rice",
-    ]);
+describe("mainsForMeal / sidesForMeal", () => {
+  it("mains excludes sides", () => {
+    expect(mainsForMeal(data, "lunch").map((d) => d.id)).toEqual(["sambar-rice", "curd-rice"]);
+  });
+  it("sides returns only side-kind dishes for the meal", () => {
+    expect(sidesForMeal(data, "lunch").map((d) => d.id)).toEqual(["beans-poriyal", "carrot-poriyal"]);
   });
 });
 
-describe("pickForMeal", () => {
+describe("pickFrom", () => {
+  const breakfast = mainsForMeal(data, "breakfast");
   it("excludes soft-excluded ids", () => {
-    const pick = pickForMeal(data, "breakfast", new Set(["idli"]), new Set(), first);
-    expect(pick?.id).toBe("pongal");
+    expect(pickFrom(breakfast, new Set(["idli"]), new Set(), first)?.id).toBe("pongal");
   });
-
   it("relaxes soft exclusions when pool would be empty", () => {
-    const soft = new Set(["idli", "pongal", "dosa"]);
-    const pick = pickForMeal(data, "breakfast", soft, new Set(), first);
-    expect(pick?.id).toBe("idli"); // relaxed back to full breakfast pool
+    expect(pickFrom(breakfast, new Set(["idli", "pongal", "dosa"]), new Set(), first)?.id).toBe("idli");
   });
-
   it("never returns a hard-excluded dish even when relaxing", () => {
-    const soft = new Set(["idli", "pongal", "dosa"]);
-    const hard = new Set(["idli"]);
-    const pick = pickForMeal(data, "breakfast", soft, hard, first);
-    expect(pick?.id).toBe("pongal");
+    expect(pickFrom(breakfast, new Set(["idli", "pongal", "dosa"]), new Set(["idli"]), first)?.id).toBe("pongal");
   });
-
-  it("returns null when no dish is tagged for the meal", () => {
-    const onlyBreakfast = [dish("idli", ["breakfast"], 6)];
-    expect(pickForMeal(onlyBreakfast, "lunch", new Set(), new Set(), first)).toBeNull();
+  it("returns null when no candidates", () => {
+    expect(pickFrom([], new Set(), new Set(), first)).toBeNull();
   });
 });
 
 describe("proteinTotal", () => {
-  it("sums protein over present picks, ignoring nulls", () => {
-    const picks: MealPicks = {
-      breakfast: data[0], lunch: data[2], dinner: null,
-    };
-    expect(proteinTotal(picks)).toBe(18);
+  it("sums protein over all four slots, ignoring nulls", () => {
+    const picks: DayPicks = { breakfast: data[0], lunch: data[2], lunchSide: data[5], dinner: null };
+    expect(proteinTotal(picks)).toBe(6 + 12 + 5);
   });
 });
 
 describe("generateMenu", () => {
+  it("fills a lunch poriyal side", () => {
+    const res = generateMenu(data, new Set(), 0, first);
+    expect(res.picks.lunchSide?.kind).toBe("side");
+  });
+
   it("never picks the same dish twice in one day", () => {
-    const small = [
-      dish("idli", ["breakfast", "dinner"], 6),
-      dish("dosa", ["breakfast", "dinner"], 7),
-      dish("sambar-rice", ["lunch"], 12),
-    ];
-    const res = generateMenu(small, new Set(), 100, first);
-    expect(res.picks.breakfast?.id).not.toBe(res.picks.dinner?.id);
+    const res = generateMenu(data, new Set(), 1000, first);
+    const ids = [res.picks.breakfast?.id, res.picks.lunch?.id, res.picks.lunchSide?.id, res.picks.dinner?.id].filter(Boolean);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("returns metGoal true when a combo can reach the goal", () => {
@@ -93,15 +87,12 @@ describe("generateMenu", () => {
   });
 });
 
-describe("respinMeal", () => {
+describe("respinSlot", () => {
   it("avoids the other slots' current picks", () => {
-    const picks: MealPicks = {
-      breakfast: data[0], // idli
-      lunch: data[2],
-      dinner: data[4], // dosa
-    };
-    const pick = respinMeal(data, "breakfast", new Set(), picks, first);
-    expect(pick?.id).toBe("idli");
-    expect(pick?.id).not.toBe("dosa");
+    const picks: DayPicks = { breakfast: data[0], lunch: data[2], lunchSide: data[5], dinner: data[4] };
+    const pick = respinSlot(data, "dinner", new Set(), picks, first);
+    // dinner mains = [idli, curd-rice, dosa]; idli + dosa held by other slots are not, only idli(breakfast) and dosa(dinner current) excluded
+    expect(pick?.id).not.toBe(picks.breakfast?.id);
+    expect(["curd-rice", "dosa", "idli"]).toContain(pick?.id);
   });
 });

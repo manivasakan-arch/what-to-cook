@@ -2,6 +2,7 @@
 import { use, useState } from "react";
 import { useStore } from "@/components/StoreProvider";
 import { DishForm } from "@/components/DishForm";
+import { DishImage } from "@/components/DishImage";
 import Link from "next/link";
 
 export default function DishDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -27,6 +28,7 @@ export default function DishDetail({ params }: { params: Promise<{ id: string }>
 
   return (
     <article className="space-y-5">
+      <DishImage name={dish.name} url={dish.imageUrl} className="h-56 w-full rounded-2xl" />
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-bold">{dish.name}</h1>

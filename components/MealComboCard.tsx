@@ -12,7 +12,7 @@ export function MealComboCard({ combo, onRespin }: { combo: MealCombo; onRespin:
     <div className="flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md">
       <div className="relative">
         {hero ? (
-          <Link href={`/dish/${hero.id}`} className="block">
+          <Link href={`/dish?id=${hero.id}`} className="block">
             <DishImage name={hero.name} url={hero.imageUrl} className="h-44 w-full" />
           </Link>
         ) : (
@@ -46,7 +46,7 @@ export function MealComboCard({ combo, onRespin }: { combo: MealCombo; onRespin:
               <li key={item.dish.id} className="flex items-center justify-between gap-3 py-2">
                 <div className="min-w-0">
                   <p className="text-[10px] font-semibold uppercase tracking-wider text-stone-400">{item.role}</p>
-                  <Link href={`/dish/${item.dish.id}`} className="block truncate font-medium hover:text-terracotta">
+                  <Link href={`/dish?id=${item.dish.id}`} className="block truncate font-medium hover:text-terracotta">
                     {item.dish.name}
                   </Link>
                 </div>

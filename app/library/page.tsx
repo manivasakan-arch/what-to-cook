@@ -67,11 +67,11 @@ export default function Library() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {visible.map((d) => (
           <div key={d.id} className="flex flex-col overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-sm transition hover:shadow-md">
-            <Link href={`/dish/${d.id}`} className="block">
+            <Link href={`/dish?id=${d.id}`} className="block">
               <DishImage name={d.name} url={d.imageUrl} className="h-36 w-full" />
             </Link>
             <div className="flex flex-1 flex-col p-4">
-              <Link href={`/dish/${d.id}`} className="font-display text-lg font-semibold leading-tight hover:text-terracotta">{d.name}</Link>
+              <Link href={`/dish?id=${d.id}`} className="font-display text-lg font-semibold leading-tight hover:text-terracotta">{d.name}</Link>
               {d.nameTamil && <p className="text-sm text-stone-500">{d.nameTamil}</p>}
               <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
                 <span className="rounded-full bg-stone-100 px-2 py-0.5 capitalize text-stone-600">{d.category}</span>

@@ -1,12 +1,13 @@
 "use client";
-import { use, useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useStore } from "@/components/StoreProvider";
 import { DishForm } from "@/components/DishForm";
 import { DishImage } from "@/components/DishImage";
 import Link from "next/link";
 
-export default function DishDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+function DishDetailInner() {
+  const id = useSearchParams().get("id") ?? "";
   const { ready, dishes, saveDish } = useStore();
   const [editing, setEditing] = useState(false);
 
@@ -80,5 +81,13 @@ export default function DishDetail({ params }: { params: Promise<{ id: string }>
         <span className="text-xs text-stone-400">Protein value is an estimate.</span>
       </div>
     </article>
+  );
+}
+
+export default function DishDetailPage() {
+  return (
+    <Suspense fallback={<p className="text-stone-500">Loading...</p>}>
+      <DishDetailInner />
+    </Suspense>
   );
 }
